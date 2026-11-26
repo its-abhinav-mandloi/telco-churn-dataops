@@ -17,6 +17,9 @@ deployments:
       name: telco-process-pool
       work_queue_name: default
       job_variables: {}
+    concurrency_limit:
+      limit: 1
+      collision_strategy: ENQUEUE
     schedules:
       - interval: 120
         timezone: UTC

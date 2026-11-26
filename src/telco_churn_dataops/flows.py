@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 import traceback
 import uuid
@@ -49,11 +50,11 @@ from telco_churn_dataops.preprocessing import (
 )
 from telco_churn_dataops.storage import (
     MANIFEST_NAME,
-    RUN_LOG_NAME,
     apply_retention,
     latest_manifest,
     relative_path,
     run_dir,
+    run_log_filename,
     write_json,
 )
 
@@ -82,9 +83,15 @@ def _retry_on_network_error(task: Any, task_run: Any, state: Any) -> bool:
 
 
 def new_run_id() -> str:
-    """Sortable run identifier: UTC timestamp plus a short Prefect flow-run (or random) id."""
-    suffix = (runtime_flow_run.id or uuid.uuid4().hex)[:8]
-    return f"{utc_now():%Y%m%dT%H%M%SZ}-{suffix}"
+    """Globally unique, sortable, filesystem-safe run identifier.
+
+    Combines a microsecond UTC timestamp with the full Prefect flow-run UUID
+    (or a full UUID4 fallback outside a Prefect run) so runs started in the same
+    second or sharing a UUID prefix never collide.
+    """
+    raw_id = str(runtime_flow_run.id or uuid.uuid4()).strip().lower()
+    safe_id = re.sub(r"[^a-z0-9-]+", "-", raw_id).strip("-") or str(uuid.uuid4())
+    return f"{utc_now():%Y%m%dT%H%M%S%fZ}-{safe_id}"
 
 
 @task(
@@ -304,7 +311,8 @@ def telco_churn_pipeline(dataset_url: str | None = None) -> dict[str, Any]:
     logger = get_run_logger()
     run_id = new_run_id()
     out_dir = run_dir(settings, run_id)
-    events = RunEventLog(out_dir / RUN_LOG_NAME, run_id, logger)
+    log_path = out_dir / run_log_filename(run_id)
+    events = RunEventLog(log_path, run_id, logger)
     started = utc_now()
     t0 = time.perf_counter()
     manifest: dict[str, Any] = {
@@ -327,7 +335,7 @@ def telco_churn_pipeline(dataset_url: str | None = None) -> dict[str, Any]:
             "test_size": settings.test_size,
         },
         "artifact_dir": relative_path(out_dir),
-        "run_log": relative_path(out_dir / RUN_LOG_NAME),
+        "run_log": relative_path(log_path),
         "errors": [],
     }
     manifest_path = out_dir / MANIFEST_NAME

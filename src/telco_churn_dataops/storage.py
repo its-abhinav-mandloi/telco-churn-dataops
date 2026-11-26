@@ -15,6 +15,11 @@ MANIFEST_NAME = "manifest.json"
 RUN_LOG_NAME = "run_log.jsonl"
 
 
+def run_log_filename(run_id: str) -> str:
+    """Return the run-scoped JSONL log filename for ``run_id``."""
+    return f"{run_id}_{RUN_LOG_NAME}"
+
+
 def atomic_write_text(path: Path, text: str) -> None:
     """Write text to ``path`` atomically (temp file + rename) so readers never see partial files."""
     path.parent.mkdir(parents=True, exist_ok=True)

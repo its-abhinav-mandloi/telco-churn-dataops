@@ -139,6 +139,10 @@ class PrefectApiAdapter:
                 "entrypoint": deployment.entrypoint,
                 "paused": bool(getattr(deployment, "paused", False)),
                 "status": _enum_str(getattr(deployment, "status", None)),
+                "concurrency_limit": (
+                    getattr(deployment, "concurrency_limit", None)
+                    or getattr(getattr(deployment, "global_concurrency_limit", None), "limit", None)
+                ),
                 "work_pool_name": deployment.work_pool_name,
                 "work_queue_name": deployment.work_queue_name,
                 "schedules": _schedules(deployment),

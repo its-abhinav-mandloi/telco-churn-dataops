@@ -97,7 +97,16 @@ make run-api
 make run-dashboard
 ```
 
-Prefect schedules `telco-churn-pipeline/telco-churn-every-2-min` with an exact `IntervalSchedule` of `120` seconds (defined in [prefect.yaml](prefect.yaml)). Flow runs, task logs, and Prefect artifacts (`telco-churn-model-metrics`, `telco-churn-run-summary`) appear in the Prefect UI at `http://127.0.0.1:4200`.
+Prefect schedules `telco-churn-pipeline/telco-churn-every-2-min` with an exact `IntervalSchedule` of `120` seconds and a deployment-level **concurrency limit of `1`** (`collision_strategy: ENQUEUE`, defined in [prefect.yaml](prefect.yaml)). Only one pipeline run executes at a time; if the worker experiences downtime, pending scheduled runs are queued rather than running concurrently. Flow runs, task logs, and Prefect artifacts (`telco-churn-model-metrics`, `telco-churn-run-summary`) appear in the Prefect UI at `http://127.0.0.1:4200`.
+
+To pause the schedule after a demo (preventing further scheduled runs):
+```bash
+# List the schedule ID, then pause it (Prefect 3.9.5 CLI):
+PREFECT_API_URL=http://127.0.0.1:4200/api .venv/bin/prefect deployment schedule ls telco-churn-pipeline/telco-churn-every-2-min
+PREFECT_API_URL=http://127.0.0.1:4200/api .venv/bin/prefect deployment schedule pause telco-churn-pipeline/telco-churn-every-2-min <SCHEDULE_ID>
+# Or pause all deployment schedules in the workspace:
+PREFECT_API_URL=http://127.0.0.1:4200/api .venv/bin/prefect deployment schedule pause --all
+```
 
 ### Docker Compose (Local Mode)
 
@@ -150,7 +159,7 @@ See [docs/API_TESTING.md](docs/API_TESTING.md) for full `curl` commands, real re
 
 ```bash
 make lint    # ruff format --check src tests && ruff check src tests
-make test    # pytest (28 deterministic unit, API, and Prefect flow tests using synthetic data)
+make test    # pytest (31 deterministic unit, API, and Prefect flow tests using synthetic data)
 ```
 
 ---

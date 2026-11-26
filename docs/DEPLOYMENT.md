@@ -46,24 +46,31 @@ set -a && source .env && set +a
 ```
 Keep this terminal open while demonstrating the scheduled runs.
 
-### 5. Verify the 2-Minute Schedule & Cloud Dashboard
+### 5. Verify the 2-Minute Schedule, Concurrency Limit & Cloud Dashboard
 1. Open [https://app.prefect.cloud](https://app.prefect.cloud) -> **Deployments** -> `telco-churn-every-2-min`.
-2. Confirm the **Schedule** shows `Every 2 minutes` (`120` seconds, active) and **Work Pool** shows `telco-process-pool` with status `Ready`.
+2. Confirm the **Schedule** shows `Every 2 minutes` (`120` seconds, active), **Concurrency Limit** is `1` (`ENQUEUE`), and **Work Pool** shows `telco-process-pool` with status `Ready`.
+   - Because the concurrency limit is `1`, only one pipeline run executes at once. If the worker is stopped or offline for several minutes, pending scheduled runs are queued and processed sequentially once the worker reconnects (each run also gets a globally unique `run_id` containing the full Prefect flow-run UUID so artifacts never overwrite each other).
 3. Open **Flow Runs** and observe two consecutive scheduled runs completing ~120 seconds apart.
 4. Click a completed run to inspect **Logs** (structured JSON lines for ingestion, preprocessing, monitoring, EDA, training) and **Artifacts** (`telco-churn-model-metrics` table and `telco-churn-run-summary` markdown).
 5. Start FastAPI with the same `.env` (`make run-api`) and call:
    ```bash
    curl -s http://127.0.0.1:8000/api/v1/application-details
    ```
-   Confirm `"is_cloud": true` and that flow, deployment/schedule, latest flow run, and work-pool/worker details match Prefect Cloud.
+   Confirm `"is_cloud": true` and that flow, deployment/schedule, concurrency limit, latest flow run, and work-pool/worker details match Prefect Cloud.
 
 ### 6. Stop the Demo (Avoid Unnecessary Runs)
 After recording your video and screenshots:
-1. Pause the schedule so Prefect Cloud stops queuing 2-minute runs:
+1. Pause the deployment schedule so Prefect Cloud stops queuing 2-minute runs:
    ```bash
-   .venv/bin/prefect deployment schedule pause telco-churn-pipeline/telco-churn-every-2-min
+   set -a && source .env && set +a
+   # Find the schedule ID (or read it from GET /api/v1/application-details -> deployment.schedules[0].id)
+   .venv/bin/prefect deployment schedule ls telco-churn-pipeline/telco-churn-every-2-min
+   .venv/bin/prefect deployment schedule pause telco-churn-pipeline/telco-churn-every-2-min <SCHEDULE_ID>
+   # Or pause all schedules in the workspace:
+   # .venv/bin/prefect deployment schedule pause --all
    ```
 2. Stop the worker with `Ctrl+C`.
+   *(To resume later for a live re-demo, run `.venv/bin/prefect deployment schedule resume telco-churn-pipeline/telco-churn-every-2-min <SCHEDULE_ID>`.)*
 
 ---
 

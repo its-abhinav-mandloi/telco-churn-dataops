@@ -74,5 +74,21 @@
 ---
 
 ## 7. Verification, Limitations & Ethics
-* Automated tests: `28` passing pytest tests + Ruff formatting/linting + GitHub Actions CI.
+* Automated tests: `31` passing pytest tests + Ruff formatting/linting + GitHub Actions CI.
 * Limitations & ethics: single static sample dataset (~7k rows), no temporal validation, no fairness audit across demographic attributes (`gender`, `SeniorCitizen`, `Partner`, `Dependents`) — decision-support only.
+
+---
+
+## 8. Submission Checklist
+
+Verify every item below before uploading `<groupid>.docx` / `<groupid>.pdf` and sharing the demo video:
+
+- [ ] **Group details:** Actual group ID, student names, BITS IDs, and individual contributions filled in (no placeholders).
+- [ ] **Prefect Cloud deployment screenshot:** Real Prefect Cloud UI showing `telco-churn-pipeline/telco-churn-every-2-min` with the active **120-second schedule** and concurrency limit `1` (never label a local server screenshot as Prefect Cloud).
+- [ ] **Consecutive scheduled runs:** Screenshot showing at least **two consecutive completed scheduled runs** (~2 minutes apart) in Prefect Cloud.
+- [ ] **Prefect logs & artifacts:** Screenshot of structured task logs and Prefect artifacts (`telco-churn-model-metrics`, `telco-churn-run-summary`).
+- [ ] **Streamlit dashboard:** Screenshot showing latest run state, data quality, monitoring/drift status, and model metrics.
+- [ ] **Swagger UI:** Screenshot of FastAPI `/docs` listing `/api/v1` endpoints.
+- [ ] **Built-in Prefect API (`200 OK`, Cloud mode):** Screenshot/output of `GET /api/v1/application-details` returning `200` with `"is_cloud": true` and flow, deployment/schedule, latest flow run, and work-pool/worker details.
+- [ ] **API status-code coverage:** Documented request/response evidence for prediction `200`, invalid payload validation `422`, and Prefect-unavailable diagnostic `503`.
+- [ ] **Final deliverables:** Exported `<groupid>.pdf` or `<groupid>.docx` uploaded to the portal and verified Google Drive demo-video link included.
