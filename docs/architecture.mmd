@@ -1,0 +1,20 @@
+flowchart LR
+    SRC["Public IBM Telco CSV<br/>(DATASET_URL)"] --> ING["1. Ingestion Task<br/>Timeout, HTTP/CSV validation,<br/>SHA-256, raw copy"]
+    ING --> RAW[("data/raw/<br/>telco_churn_&lt;run_id&gt;.csv")]
+    ING --> PREP["2. Preprocessing Task<br/>TotalCharges fix, quality report,<br/>stratified split, ColumnTransformer"]
+    PREP --> MON["3. Monitoring Task<br/>Quality + drift vs prior run<br/>(PASS / WARN / FAIL)"]
+    MON --> EDA["4. EDA Task<br/>Univariate/bivariate plots,<br/>Pearson, Cramer's V, tenure bins"]
+    MON --> TRAIN["5. Training & Evaluation Task<br/>Logistic Regression vs Random Forest,<br/>ROC-AUC champion, model card"]
+    EDA --> ART[("artifacts/runs/&lt;run_id&gt;/<br/>manifest.json, run_log.jsonl,<br/>plots, tables, metrics")]
+    TRAIN --> ART
+    TRAIN --> MODEL[("artifacts/model/<br/>champion.joblib + metadata")]
+
+    PREF["Prefect Orchestrator<br/>(Local Server or Prefect Cloud)<br/>Deployment: 120s interval<br/>Work Pool + Worker + Logs"] -. "Triggers & logs" .-> ING
+    PREF -. "Stores flow/deployment/run state" .-> PAPI["Prefect Built-in REST API<br/>(/flows, /deployments, /flow_runs, /work_pools)"]
+
+    ART --> API["FastAPI Service (/api/v1)<br/>/health, /predictions, /runs/latest,<br/>/metrics/latest, /eda/latest,<br/>/application-details"]
+    MODEL --> API
+    PAPI --> API
+
+    ART --> DASH["Streamlit Dashboard<br/>Run state, quality, metrics,<br/>drift, EDA, logs + Prefect UI link"]
+    PREF --> PUI["Prefect UI / Cloud Dashboard<br/>(Authoritative runs & logs)"]

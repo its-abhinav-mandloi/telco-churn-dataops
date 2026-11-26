@@ -1,0 +1,23 @@
+name: telco-churn-dataops
+prefect-version: 3.9.5
+
+deployments:
+  - name: telco-churn-every-2-min
+    version: "1.0.0"
+    tags:
+      - telco-churn
+      - dataops
+      - assignment-1
+    description: >
+      Automated Telco Customer Churn DataOps pipeline (ingestion, preprocessing,
+      data-quality/drift monitoring, EDA, model training/evaluation) running every 120 seconds.
+    entrypoint: src/telco_churn_dataops/flows.py:telco_churn_pipeline
+    parameters: {}
+    work_pool:
+      name: telco-process-pool
+      work_queue_name: default
+      job_variables: {}
+    schedules:
+      - interval: 120
+        timezone: UTC
+        active: true

@@ -1,0 +1,98 @@
+{
+  "info": {
+    "name": "Telco Churn DataOps API",
+    "description": "Reproducible HTTP requests for AIMLCZG549 Assignment I (health, predictions, pipeline manifests, metrics, EDA, and Prefect built-in application details).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "GET Health (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/health"
+      }
+    },
+    {
+      "name": "GET Application Details via Prefect API (200 or 503)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/application-details"
+      }
+    },
+    {
+      "name": "POST Prediction - Valid Customer (200)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"gender\": \"Female\",\n  \"SeniorCitizen\": 0,\n  \"Partner\": \"Yes\",\n  \"Dependents\": \"No\",\n  \"tenure\": 2,\n  \"PhoneService\": \"Yes\",\n  \"MultipleLines\": \"No\",\n  \"InternetService\": \"Fiber optic\",\n  \"OnlineSecurity\": \"No\",\n  \"OnlineBackup\": \"No\",\n  \"DeviceProtection\": \"No\",\n  \"TechSupport\": \"No\",\n  \"StreamingTV\": \"Yes\",\n  \"StreamingMovies\": \"Yes\",\n  \"Contract\": \"Month-to-month\",\n  \"PaperlessBilling\": \"Yes\",\n  \"PaymentMethod\": \"Electronic check\",\n  \"MonthlyCharges\": 95.7,\n  \"TotalCharges\": 191.4\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/predictions"
+      }
+    },
+    {
+      "name": "POST Prediction - Invalid Customer Payload (422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"gender\": \"Female\",\n  \"SeniorCitizen\": 0,\n  \"Partner\": \"Yes\",\n  \"Dependents\": \"No\",\n  \"tenure\": -5,\n  \"Contract\": \"Weekly\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/predictions"
+      }
+    },
+    {
+      "name": "GET Latest Run Manifest (200 or 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/runs/latest"
+      }
+    },
+    {
+      "name": "GET Run History (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/runs?limit=10"
+      }
+    },
+    {
+      "name": "GET Latest Model Metrics (200 or 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/metrics/latest"
+      }
+    },
+    {
+      "name": "GET Latest EDA Summary (200 or 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/eda/latest"
+      }
+    }
+  ]
+}
