@@ -31,6 +31,9 @@ artifacts/*
 docs/screenshots/*
 !docs/screenshots/.gitkeep
 
+# Private submission artifacts (final reports, screenshots, BITS IDs, video links)
+submission/
+
 # Scratch and local workspace files
 tmp/
 *.log

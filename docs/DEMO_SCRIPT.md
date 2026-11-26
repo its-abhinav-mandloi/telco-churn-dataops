@@ -39,5 +39,5 @@
   4. `POST /api/v1/predictions` with invalid values (`tenure: -5`, `Contract: "Weekly"`) -> `422 Unprocessable Entity`.
 
 ### 5. Automated Tests & Wrap-Up (5:45 – 6:30)
-* **Show:** Terminal running `make lint && make test` (28 passing tests, zero Ruff errors) and briefly note the GitHub Actions CI workflow (`.github/workflows/ci.yml`).
+* **Show:** Terminal running `make lint && make test` (31 passing tests, zero Ruff errors) and briefly note the GitHub Actions CI workflow (`.github/workflows/ci.yml`).
 * **Wrap up:** Summarize how both Sub-Objective 1 (10 marks) and Sub-Objective 2 (5 marks) are satisfied end-to-end.
